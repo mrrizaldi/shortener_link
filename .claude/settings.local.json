@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"app/[slug]\")",
+      "Bash(pnpm add next react react-dom)",
+      "Bash(pnpm add prisma @prisma/client pg)",
+      "Bash(pnpm add nanoid zod)",
+      "Bash(pnpm add -D typescript @types/node @types/react eslint prettier)",
+      "Bash(npx prisma generate)",
+      "Bash(pnpm add chart.js react-chartjs-2)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

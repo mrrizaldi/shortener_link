@@ -1,0 +1,39 @@
+services:
+  shortener:
+    image: ghcr.io/mrrizaldi/shortener:latest
+    container_name: shortener_app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    networks:
+      - shortener_network
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: shortener_postgres
+    restart: always
+    environment:
+      - POSTGRES_DB=shortener
+      - POSTGRES_USER=shortener
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-defaultpassword}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - shortener_network
+
+volumes:
+  postgres_data:
+
+networks:
+  shortener_network:
+    driver: bridge
