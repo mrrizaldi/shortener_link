@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 export default function Navbar() {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,24 +27,26 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-3 group">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-200 group-hover:scale-105">
-                <span className="text-white font-bold text-xl">S</span>
+            <Link href="/" className="flex items-center space-x-2 sm:space-x-3 group">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-600 to-blue-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-200 group-hover:scale-105">
+                <span className="text-white font-bold text-lg sm:text-xl">S</span>
               </div>
-              <span className={`text-2xl font-bold transition-all duration-300 ${
+              <span className={`text-xl sm:text-2xl font-bold transition-all duration-300 ${
                 isScrolled 
                   ? 'bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent'
                   : 'text-gray-800 drop-shadow-sm'
               }`}>
-                Shortener
+                <span className="hidden sm:inline">Shortener</span>
+                <span className="sm:hidden">Short</span>
               </span>
             </Link>
           </div>
 
-          <div className="flex items-center space-x-2">
+          {/* Desktop Menu */}
+          <div className="hidden sm:flex items-center space-x-2">
             <Link
               href="/"
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+              className={`px-3 py-2 lg:px-4 lg:py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
                 pathname === '/'
                   ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg'
                   : isScrolled 
@@ -51,11 +54,12 @@ export default function Navbar() {
                     : 'text-gray-800 hover:bg-gray-200/50 drop-shadow-sm'
               }`}
             >
-              🚀 Create
+              <span className="hidden lg:inline">🚀 Create</span>
+              <span className="lg:hidden">🚀</span>
             </Link>
             <Link
               href="/dashboard"
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+              className={`px-3 py-2 lg:px-4 lg:py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
                 pathname && pathname.startsWith('/dashboard')
                   ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg'
                   : isScrolled 
@@ -63,7 +67,62 @@ export default function Navbar() {
                     : 'text-gray-800 hover:bg-gray-200/50 drop-shadow-sm'
               }`}
             >
-              📊 Dashboard
+              <span className="hidden lg:inline">📊 Dashboard</span>
+              <span className="lg:hidden">📊</span>
+            </Link>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="sm:hidden flex items-center">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className={`p-2 rounded-lg transition-all duration-200 ${
+                isScrolled 
+                  ? 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                  : 'text-gray-800 hover:bg-gray-200/50'
+              }`}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {isMobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <div className={`sm:hidden transition-all duration-300 overflow-hidden ${
+          isMobileMenuOpen ? 'max-h-40 pb-4' : 'max-h-0'
+        }`}>
+          <div className="space-y-2 pt-2">
+            <Link
+              href="/"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`block px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                pathname === '/'
+                  ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg'
+                  : isScrolled 
+                    ? 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                    : 'text-gray-800 hover:bg-gray-200/50'
+              }`}
+            >
+              🚀 Create Short Link
+            </Link>
+            <Link
+              href="/dashboard"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`block px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                pathname && pathname.startsWith('/dashboard')
+                  ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg'
+                  : isScrolled 
+                    ? 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                    : 'text-gray-800 hover:bg-gray-200/50'
+              }`}
+            >
+              📊 Dashboard & Analytics
             </Link>
           </div>
         </div>
