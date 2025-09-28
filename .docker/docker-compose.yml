@@ -3,8 +3,7 @@ services:
     image: ghcr.io/mrrizaldi/shortener:latest
     container_name: shortener_app
     restart: always
-    ports:
-      - "3000:3000"
+    network_mode: "host"
     environment:
       - NODE_ENV=production
       - DATABASE_URL=${DATABASE_URL}
