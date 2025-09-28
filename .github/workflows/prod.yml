@@ -104,6 +104,7 @@ jobs:
             cd /home/mrrizaldi/shortener
             cat > .env << EOF
             DATABASE_URL=${{ secrets.DATABASE_URL }}
+            NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }}
             # Add other environment variables as needed
             EOF
 
