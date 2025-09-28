@@ -10,30 +10,5 @@ services:
       - DATABASE_URL=${DATABASE_URL}
     env_file:
       - .env
-    depends_on:
-      - postgres
-    networks:
-      - shortener_network
 
-  postgres:
-    image: postgres:15-alpine
-    container_name: shortener_postgres
-    restart: always
-    environment:
-      - POSTGRES_DB=shortener
-      - POSTGRES_USER=shortener
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-defaultpassword}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - "5432:5432"
-    networks:
-      - shortener_network
-
-volumes:
-  postgres_data:
-
-networks:
-  shortener_network:
-    driver: bridge
+# No need for volumes or networks since we're using host network or external PostgreSQL
