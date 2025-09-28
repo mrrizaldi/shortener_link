@@ -7,7 +7,9 @@
       "Bash(pnpm add nanoid zod)",
       "Bash(pnpm add -D typescript @types/node @types/react eslint prettier)",
       "Bash(npx prisma generate)",
-      "Bash(pnpm add chart.js react-chartjs-2)"
+      "Bash(pnpm add chart.js react-chartjs-2)",
+      "Bash(pnpm add qrcode)",
+      "Bash(pnpm add -D @types/qrcode)"
     ],
     "deny": [],
     "ask": []

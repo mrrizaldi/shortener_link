@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import QRModal from '../components/QRModal';
 
 interface UrlRecord {
   slug: string;
@@ -14,6 +15,11 @@ export default function Dashboard() {
   const [urls, setUrls] = useState<UrlRecord[]>([]);
   const [isLoadingUrls, setIsLoadingUrls] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [qrModal, setQrModal] = useState<{ isOpen: boolean; slug: string; shortUrl: string }>({
+    isOpen: false,
+    slug: '',
+    shortUrl: ''
+  });
 
   const fetchUrls = async () => {
     try {
@@ -51,6 +57,22 @@ export default function Dashboard() {
     url.slug.toLowerCase().includes(searchTerm.toLowerCase()) ||
     url.originalUrl.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const openQRModal = (slug: string) => {
+    setQrModal({
+      isOpen: true,
+      slug,
+      shortUrl: formatShortUrl(slug)
+    });
+  };
+
+  const closeQRModal = () => {
+    setQrModal({
+      isOpen: false,
+      slug: '',
+      shortUrl: ''
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-25 to-white relative overflow-hidden pt-16">
@@ -173,6 +195,9 @@ export default function Dashboard() {
                         Created At
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
+                        QR Code
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
                         Analytics
                       </th>
                     </tr>
@@ -204,6 +229,17 @@ export default function Dashboard() {
                           {formatDate(url.createdAt)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
+                          <button
+                            onClick={() => openQRModal(url.slug)}
+                            className="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                            title="View QR Code"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </button>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <Link
                             href={`/dashboard/${url.slug}`}
                             className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white text-sm font-semibold rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg"
@@ -220,6 +256,14 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      {/* QR Code Modal */}
+      <QRModal
+        isOpen={qrModal.isOpen}
+        onClose={closeQRModal}
+        slug={qrModal.slug}
+        shortUrl={qrModal.shortUrl}
+      />
     </div>
   );
 }
