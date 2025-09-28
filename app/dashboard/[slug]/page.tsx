@@ -91,7 +91,7 @@ export default function AnalyticsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-25 to-white pt-16 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center">
             <p className="text-gray-500">Loading analytics...</p>
@@ -103,13 +103,13 @@ export default function AnalyticsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-25 to-white pt-16 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center">
             <p className="text-red-600">{error}</p>
             <button
               onClick={() => router.push('/dashboard')}
-              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+              className="mt-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white px-4 py-2 rounded-md hover:from-blue-700 hover:to-blue-600 transition-all duration-200"
             >
               Back to Dashboard
             </button>
@@ -185,30 +185,35 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-25 to-white relative overflow-hidden pt-16">
+      {/* Background decorations */}
+      <div className="absolute top-20 left-10 w-32 h-32 bg-blue-100 rounded-full blur-3xl opacity-50"></div>
+      <div className="absolute top-40 right-20 w-40 h-40 bg-blue-200 rounded-full blur-3xl opacity-30"></div>
+      <div className="absolute bottom-20 left-1/3 w-24 h-24 bg-blue-150 rounded-full blur-2xl opacity-40"></div>
+
+      <div className="max-w-6xl mx-auto relative z-10 py-12 px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
           <button
             onClick={() => router.push('/dashboard')}
-            className="mb-4 text-blue-600 hover:text-blue-800 underline"
+            className="mb-4 inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200"
           >
             ← Back to Dashboard
           </button>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Analytics for {slug}
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent mb-2">
+            Analytics for /{slug}
           </h1>
-          <p className="text-gray-600 mt-2">
-            Total Clicks: <span className="font-semibold">{stats.totalClicks}</span>
+          <p className="text-xl text-gray-600 mt-2">
+            Total Clicks: <span className="font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">{stats.totalClicks}</span>
           </p>
         </div>
 
         {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Line Chart - Clicks per Day */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Clicks Over Time
+          <div className="bg-white rounded-2xl shadow-xl p-6 backdrop-blur-sm bg-opacity-95 border border-white/20">
+            <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent mb-4">
+              📈 Clicks Over Time
             </h2>
             {stats.clicksPerDay.length > 0 ? (
               <Line data={lineChartData} options={chartOptions} />
@@ -218,9 +223,9 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Pie Chart - Top Referrers */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Top Referrers
+          <div className="bg-white rounded-2xl shadow-xl p-6 backdrop-blur-sm bg-opacity-95 border border-white/20">
+            <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent mb-4">
+              🔗 Top Referrers
             </h2>
             {stats.topReferrers.length > 0 ? (
               <Pie data={pieChartData} options={chartOptions} />
@@ -230,9 +235,9 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Bar Chart - Browsers */}
-          <div className="bg-white rounded-lg shadow-md p-6 lg:col-span-2">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Browsers & Devices
+          <div className="bg-white rounded-2xl shadow-xl p-6 backdrop-blur-sm bg-opacity-95 border border-white/20 lg:col-span-2">
+            <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent mb-4">
+              🌐 Browsers & Devices
             </h2>
             {processedBrowsers.length > 0 ? (
               <Bar data={barChartData} options={chartOptions} />
@@ -245,19 +250,19 @@ export default function AnalyticsPage() {
         {/* Raw Data Tables */}
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Top Referrers Table */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Detailed Referrers
+          <div className="bg-white rounded-2xl shadow-xl p-6 backdrop-blur-sm bg-opacity-95 border border-white/20">
+            <h3 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent mb-4">
+              🔍 Detailed Referrers
             </h3>
             {stats.topReferrers.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-gradient-to-r from-blue-50 to-blue-25">
                     <tr>
-                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-3 py-3 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
                         Referrer
                       </th>
-                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-3 py-3 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
                         Clicks
                       </th>
                     </tr>
@@ -282,19 +287,19 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Top Browsers Table */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Detailed Browsers
+          <div className="bg-white rounded-2xl shadow-xl p-6 backdrop-blur-sm bg-opacity-95 border border-white/20">
+            <h3 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent mb-4">
+              🔎 Detailed Browsers
             </h3>
             {processedBrowsers.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-gradient-to-r from-blue-50 to-blue-25">
                     <tr>
-                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-3 py-3 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
                         Browser
                       </th>
-                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-3 py-3 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
                         Clicks
                       </th>
                     </tr>
