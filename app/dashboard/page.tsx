@@ -44,7 +44,7 @@ export default function Dashboard() {
   };
 
   const formatShortUrl = (slug: string) => {
-    return `${window.location.origin}/${slug}`;
+    return `https://mrrizaldi.me/${slug}`;
   };
 
   const filteredUrls = urls.filter((url) =>

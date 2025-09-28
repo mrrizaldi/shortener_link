@@ -33,8 +33,7 @@ export default function Home() {
         throw new Error(data.error || 'Failed to shorten URL');
       }
 
-      const baseUrl = window.location.origin;
-      setShortUrl(`${baseUrl}/${data.slug}`);
+      setShortUrl(data.shortUrl);
       setOriginalUrl('');
       setCustomSlug('');
     } catch (err) {
