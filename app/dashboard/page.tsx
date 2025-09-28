@@ -21,6 +21,7 @@ export default function Dashboard() {
   const { data: urls = [], isLoading: isLoadingUrls } = useUrls();
   const deleteUrl = useDeleteUrl();
   const [searchTerm, setSearchTerm] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
   const [qrModal, setQrModal] = useState<{ isOpen: boolean; slug: string; shortUrl: string }>({
     isOpen: false,
     slug: '',
@@ -59,15 +60,30 @@ export default function Dashboard() {
   const handleDelete = async (slug: string) => {
     if (window.confirm('Are you sure you want to delete this URL? This action cannot be undone.')) {
       try {
+        setIsDeleting(true);
         await deleteUrl.mutateAsync(slug);
+        // Cache will be invalidated automatically by the mutation
       } catch (error) {
         alert('Failed to delete URL: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      } finally {
+        setIsDeleting(false);
       }
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-25 to-white relative overflow-hidden pt-16">
+      {/* Loading Overlay */}
+      {isDeleting && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-8 flex flex-col items-center space-y-4 shadow-2xl">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            <p className="text-lg font-medium text-gray-700">Deleting URL...</p>
+            <p className="text-sm text-gray-500">Please wait while we remove the link</p>
+          </div>
+        </div>
+      )}
+
       {/* Background decorations */}
       <div className="absolute top-20 left-10 w-32 h-32 bg-blue-100 rounded-full blur-3xl opacity-50"></div>
       <div className="absolute top-40 right-20 w-40 h-40 bg-blue-200 rounded-full blur-3xl opacity-30"></div>
@@ -239,11 +255,11 @@ export default function Dashboard() {
                             onClick={() => handleDelete(url.slug)}
                             size="sm"
                             variant="destructive"
-                            disabled={deleteUrl.isPending}
+                            disabled={deleteUrl.isPending || isDeleting}
                             className="h-8 w-8 p-0"
                             title="Delete URL"
                           >
-                            {deleteUrl.isPending ? (
+                            {deleteUrl.isPending || isDeleting ? (
                               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                             ) : (
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
