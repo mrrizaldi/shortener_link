@@ -90,7 +90,7 @@ export default function Home() {
                 onChange={(e) => setOriginalUrl(e.target.value)}
                 placeholder="https://example.com/your-very-long-url-that-needs-shortening"
                 required
-                className="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all duration-200 bg-gray-50 focus:bg-white"
+                className="w-full px-4 py-4 text-gray-800 text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all duration-200 bg-gray-50 focus:bg-white"
               />
             </div>
 
@@ -104,7 +104,7 @@ export default function Home() {
                 value={customSlug}
                 onChange={(e) => setCustomSlug(e.target.value)}
                 placeholder="my-awesome-link"
-                className="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all duration-200 bg-gray-50 focus:bg-white"
+                className="w-full px-4 py-4 text-gray-800 text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all duration-200 bg-gray-50 focus:bg-white"
               />
               <p className="text-sm text-gray-500 flex items-center">
                 💡 Leave empty to auto-generate a unique slug
