@@ -13,6 +13,9 @@ export default async function handler(
 
   try {
     const urls = await prisma.url.findMany({
+      where: {
+        isDeleted: false
+      },
       select: {
         slug: true,
         originalUrl: true,

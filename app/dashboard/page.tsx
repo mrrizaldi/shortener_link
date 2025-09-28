@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useUrls } from '@/lib/hooks';
+import { useUrls, useDeleteUrl } from '@/lib/hooks';
 
 interface UrlRecord {
   slug: string;
@@ -19,6 +19,7 @@ interface UrlRecord {
 
 export default function Dashboard() {
   const { data: urls = [], isLoading: isLoadingUrls } = useUrls();
+  const deleteUrl = useDeleteUrl();
   const [searchTerm, setSearchTerm] = useState('');
   const [qrModal, setQrModal] = useState<{ isOpen: boolean; slug: string; shortUrl: string }>({
     isOpen: false,
@@ -53,6 +54,16 @@ export default function Dashboard() {
       slug: '',
       shortUrl: ''
     });
+  };
+
+  const handleDelete = async (slug: string) => {
+    if (window.confirm('Are you sure you want to delete this URL? This action cannot be undone.')) {
+      try {
+        await deleteUrl.mutateAsync(slug);
+      } catch (error) {
+        alert('Failed to delete URL: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      }
+    }
   };
 
   return (
@@ -177,8 +188,9 @@ export default function Dashboard() {
                       <TableHead>Short URL</TableHead>
                       <TableHead>Original URL</TableHead>
                       <TableHead>Created At</TableHead>
-                      <TableHead>QR Code  </TableHead>
+                      <TableHead>QR Code</TableHead>
                       <TableHead>Details</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -220,6 +232,24 @@ export default function Dashboard() {
                             <Link href={`/dashboard/${url.slug}`}>
                               📊 Details
                             </Link>
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            onClick={() => handleDelete(url.slug)}
+                            size="sm"
+                            variant="destructive"
+                            disabled={deleteUrl.isPending}
+                            className="h-8 w-8 p-0"
+                            title="Delete URL"
+                          >
+                            {deleteUrl.isPending ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                            ) : (
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            )}
                           </Button>
                         </TableCell>
                       </TableRow>

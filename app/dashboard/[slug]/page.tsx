@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useStats } from '@/lib/hooks';
+import { useStats, useDeleteUrl } from '@/lib/hooks';
 
 interface DetailStatsData {
   slug: string;
@@ -29,6 +29,7 @@ export default function DetailPage() {
   const [currentInterval, setCurrentInterval] = useState('1d');
 
   const { data: stats, isLoading, error } = useStats(slug, currentInterval);
+  const deleteUrl = useDeleteUrl();
 
   const handleIntervalChange = React.useCallback((interval: string) => {
     setCurrentInterval(interval);
@@ -43,6 +44,17 @@ export default function DetailPage() {
       navigator.clipboard.writeText(formatShortUrl(stats.slug));
     }
   }, [stats, formatShortUrl]);
+
+  const handleDelete = React.useCallback(async () => {
+    if (slug && window.confirm('Are you sure you want to delete this URL? This action cannot be undone.')) {
+      try {
+        await deleteUrl.mutateAsync(slug);
+        router.push('/dashboard');
+      } catch (error) {
+        alert('Failed to delete URL: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      }
+    }
+  }, [slug, deleteUrl, router]);
 
   if (isLoading) {
     return (
@@ -87,13 +99,29 @@ export default function DetailPage() {
       <div className="max-w-6xl mx-auto relative z-10 py-8 px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => router.push('/dashboard')}
-            className="mb-4"
-          >
-            ← Back to Dashboard
-          </Button>
+          <div className="flex items-center justify-between mb-4">
+            <Button
+              variant="ghost"
+              onClick={() => router.push('/dashboard')}
+            >
+              ← Back to Dashboard
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={deleteUrl.isPending}
+              className="flex items-center gap-2"
+            >
+              {deleteUrl.isPending ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              )}
+              Delete URL
+            </Button>
+          </div>
           <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent mb-4">
             Link Details
           </h1>

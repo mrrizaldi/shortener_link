@@ -61,7 +61,10 @@ export default async function handler(
   try {
     // First, find the URL record
     const urlRecord = await prisma.url.findUnique({
-      where: { slug },
+      where: {
+        slug,
+        isDeleted: false
+      },
       select: { id: true, originalUrl: true, createdAt: true, hitCount: true }
     });
 

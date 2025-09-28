@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface UrlRecord {
   slug: string;
@@ -42,5 +42,26 @@ export function useStats(slug: string, interval: string) {
       return response.json();
     },
     enabled: !!slug,
+  });
+}
+
+export function useDeleteUrl() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (slug: string): Promise<{ message: string }> => {
+      const response = await fetch(`/api/delete/${slug}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete URL');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate and refetch the URLs list
+      queryClient.invalidateQueries({ queryKey: ['urls'] });
+    },
   });
 }
