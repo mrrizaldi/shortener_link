@@ -97,16 +97,18 @@ export default function Navbar() {
         <div className={`sm:hidden transition-all duration-300 overflow-hidden ${
           isMobileMenuOpen ? 'max-h-40 pb-4' : 'max-h-0'
         }`}>
-          <div className="space-y-2 pt-2">
+          <div className={`space-y-2 pt-2 px-2 pb-2 mx-2 rounded-xl transition-all duration-300 ${
+            isScrolled 
+              ? 'bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-lg'
+              : 'bg-white/90 backdrop-blur-md border border-white/30 shadow-xl'
+          }`}>
             <Link
               href="/"
               onClick={() => setIsMobileMenuOpen(false)}
-              className={`block px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+              className={`block px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                 pathname === '/'
-                  ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg'
-                  : isScrolled 
-                    ? 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-                    : 'text-gray-800 hover:bg-gray-200/50'
+                  ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-md'
+                  : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
               }`}
             >
               🚀 Create Short Link
@@ -114,12 +116,10 @@ export default function Navbar() {
             <Link
               href="/dashboard"
               onClick={() => setIsMobileMenuOpen(false)}
-              className={`block px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+              className={`block px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                 pathname && pathname.startsWith('/dashboard')
-                  ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg'
-                  : isScrolled 
-                    ? 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-                    : 'text-gray-800 hover:bg-gray-200/50'
+                  ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-md'
+                  : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
               }`}
             >
               📊 Dashboard & Analytics
