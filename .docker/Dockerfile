@@ -43,4 +43,4 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Start the application using Next.js start command
-CMD ["pnpm", "start"]
+CMD ["npm", "start"]
