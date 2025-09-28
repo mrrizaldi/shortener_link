@@ -2,12 +2,27 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 export default function Navbar() {
   const pathname = usePathname();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <nav className="bg-white/90 backdrop-blur-md shadow-lg border-b border-white/20 sticky top-0 z-50">
+    <nav className={`sticky top-0 z-50 transition-all duration-300 ${
+      isScrolled 
+        ? 'bg-white/90 backdrop-blur-md shadow-lg border-b border-white/20' 
+        : 'bg-transparent'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -27,7 +42,7 @@ export default function Navbar() {
               className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
                 pathname === '/'
                   ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg'
-                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                  : `${isScrolled ? 'text-gray-600 hover:text-gray-800 hover:bg-gray-100' : 'text-gray-700 hover:text-gray-900 hover:bg-white/20'}`
               }`}
             >
               🚀 Create
@@ -37,7 +52,7 @@ export default function Navbar() {
               className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
                 pathname && pathname.startsWith('/dashboard')
                   ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg'
-                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                  : `${isScrolled ? 'text-gray-600 hover:text-gray-800 hover:bg-gray-100' : 'text-gray-700 hover:text-gray-900 hover:bg-white/20'}`
               }`}
             >
               📊 Dashboard
