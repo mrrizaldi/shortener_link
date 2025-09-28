@@ -90,6 +90,23 @@ jobs:
           target: /home/mrrizaldi/shortener
           strip_components: 1
 
+      - name: Create .env file on Home Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOME_SERVER_IP }}
+          username: ${{ secrets.HOME_SERVER_USER }}
+          password: ${{ secrets.HOME_SERVER_PASSWORD }}
+          proxy_host: ${{ secrets.VPS_IP }}
+          proxy_username: ${{ secrets.VPS_USER }}
+          proxy_password: ${{ secrets.VPS_PASSWORD }}
+          proxy_port: ${{ secrets.VPS_PORT }}
+          script: |
+            cd /home/mrrizaldi/shortener
+            cat > .env << EOF
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            # Add other environment variables as needed
+            EOF
+
       - name: Deploy to Home Server via VPS Jump
         uses: appleboy/ssh-action@master
         with:
@@ -102,6 +119,8 @@ jobs:
           proxy_port: ${{ secrets.VPS_PORT }}
           script: |
             cd /home/mrrizaldi/shortener
+            echo ${{ secrets.PACKAGE_TOKEN }} | docker login ghcr.io -u ${{ secrets.PACKAGE_USERNAME }} --password-stdin
             docker pull ghcr.io/mrrizaldi/shortener:latest
             docker compose down
             docker compose up -d
+            docker logout ghcr.io
