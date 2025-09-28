@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import QRModal from '../components/QRModal';
+import { formatDistanceToNow } from 'date-fns';
 
 interface UrlRecord {
   slug: string;
@@ -40,13 +41,7 @@ export default function Dashboard() {
   }, []);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return formatDistanceToNow(new Date(dateString), { addSuffix: true });
   };
 
   const formatShortUrl = (slug: string) => {
@@ -189,16 +184,13 @@ export default function Dashboard() {
                         Original URL
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
-                        Clicks
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
                         Created At
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
                         QR Code
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
-                        Analytics
+                        Details
                       </th>
                     </tr>
                   </thead>
@@ -220,11 +212,6 @@ export default function Dashboard() {
                             {url.originalUrl}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800">
-                            👆 {url.hitCount}
-                          </span>
-                        </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">
                           {formatDate(url.createdAt)}
                         </td>
@@ -244,7 +231,7 @@ export default function Dashboard() {
                             href={`/dashboard/${url.slug}`}
                             className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white text-sm font-semibold rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg"
                           >
-                            📊 Analytics
+                            📊 Details
                           </Link>
                         </td>
                       </tr>

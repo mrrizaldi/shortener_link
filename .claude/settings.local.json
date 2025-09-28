@@ -9,7 +9,8 @@
       "Bash(npx prisma generate)",
       "Bash(pnpm add chart.js react-chartjs-2)",
       "Bash(pnpm add qrcode)",
-      "Bash(pnpm add -D @types/qrcode)"
+      "Bash(pnpm add -D @types/qrcode)",
+      "Bash(pnpm add date-fns)"
     ],
     "deny": [],
     "ask": []
