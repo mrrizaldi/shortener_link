@@ -54,16 +54,21 @@ jobs:
       - name: Prepare Docker context
         run: |
           mkdir -p .docker/build
-          # Copy standalone build output
-          cp -r .next/standalone/* .docker/build/
-          cp -r .next/static .docker/build/.next/
+          # Copy Next.js build output (non-standalone)
+          cp -r .next .docker/build/
           cp -r public .docker/build/
           # Copy package files for dependencies
           cp package.json .docker/build/
           cp pnpm-lock.yaml .docker/build/
+          # Copy source files
+          cp -r app .docker/build/
+          cp -r pages .docker/build/
+          cp next.config.ts .docker/build/
           # Copy Prisma schema and generated client
           cp -r prisma .docker/build/
           cp -r node_modules/.prisma .docker/build/node_modules/ 2>/dev/null || true
+          # Copy node_modules
+          cp -r node_modules .docker/build/
 
       - name: Build & Push Docker Image
         run: |
