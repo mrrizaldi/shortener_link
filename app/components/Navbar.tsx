@@ -28,16 +28,13 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2 sm:space-x-3 group">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-600 to-blue-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-200 group-hover:scale-105">
-                <span className="text-white font-bold text-lg sm:text-xl">S</span>
-              </div>
               <span className={`text-xl sm:text-2xl font-bold transition-all duration-300 ${
                 isScrolled 
                   ? 'bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent'
                   : 'text-gray-800 drop-shadow-sm'
               }`}>
-                <span className="hidden sm:inline">Shortener</span>
-                <span className="sm:hidden">Short</span>
+                <span className="hidden sm:inline">mrrizaldi's</span>
+                <span className="sm:hidden">mrrizaldi's</span>
               </span>
             </Link>
           </div>
