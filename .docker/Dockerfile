@@ -32,6 +32,9 @@ COPY build/pages ./pages
 COPY build/next.config.ts ./
 COPY build/prisma ./prisma
 
+RUN corepack enable pnpm && pnpm add prisma --save-dev
+RUN corepack enable pnpm && pnpm exec prisma generate
+
 # Change ownership of the app directory to nextjs user
 RUN chown -R nextjs:nodejs /app
 
