@@ -35,7 +35,7 @@ export async function GET(
     });
 
     // Return the QR code as an image response
-    return new NextResponse(qrCodeBuffer, {
+    return new NextResponse(new Uint8Array(qrCodeBuffer), {
       status: 200,
       headers: {
         'Content-Type': 'image/png',
