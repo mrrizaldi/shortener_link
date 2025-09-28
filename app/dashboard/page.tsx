@@ -1,9 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import QRModal from '../components/QRModal';
 import { formatDistanceToNow } from 'date-fns';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useUrls } from '@/lib/hooks';
 
 interface UrlRecord {
   slug: string;
@@ -13,32 +18,13 @@ interface UrlRecord {
 }
 
 export default function Dashboard() {
-  const [urls, setUrls] = useState<UrlRecord[]>([]);
-  const [isLoadingUrls, setIsLoadingUrls] = useState(true);
+  const { data: urls = [], isLoading: isLoadingUrls } = useUrls();
   const [searchTerm, setSearchTerm] = useState('');
   const [qrModal, setQrModal] = useState<{ isOpen: boolean; slug: string; shortUrl: string }>({
     isOpen: false,
     slug: '',
     shortUrl: ''
   });
-
-  const fetchUrls = async () => {
-    try {
-      const response = await fetch('/api/urls');
-      if (response.ok) {
-        const data = await response.json();
-        setUrls(data);
-      }
-    } catch (err) {
-      console.error('Error fetching URLs:', err);
-    } finally {
-      setIsLoadingUrls(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUrls();
-  }, []);
 
   const formatDate = (dateString: string) => {
     return formatDistanceToNow(new Date(dateString), { addSuffix: true });
@@ -87,117 +73,118 @@ export default function Dashboard() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-2xl shadow-xl p-6 backdrop-blur-sm bg-opacity-95 border border-white/20">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-1">Total Links</h3>
-                <p className="text-3xl font-bold text-blue-600">{urls.length}</p>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Total Links</p>
+                  <p className="text-3xl font-bold text-blue-600">{urls.length}</p>
+                </div>
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-2xl">🔗</span>
+                </div>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-2xl">🔗</span>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Total Clicks</p>
+                  <p className="text-3xl font-bold text-blue-600">
+                    {urls.reduce((sum, url) => sum + url.hitCount, 0)}
+                  </p>
+                </div>
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                  <span className="text-2xl">👆</span>
+                </div>
               </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-2xl shadow-xl p-6 backdrop-blur-sm bg-opacity-95 border border-white/20">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-1">Total Clicks</h3>
-                <p className="text-3xl font-bold text-blue-600">
-                  {urls.reduce((sum, url) => sum + url.hitCount, 0)}
-                </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Average Clicks</p>
+                  <p className="text-3xl font-bold text-blue-600">
+                    {urls.length > 0 ? Math.round(urls.reduce((sum, url) => sum + url.hitCount, 0) / urls.length) : 0}
+                  </p>
+                </div>
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                  <span className="text-2xl">📊</span>
+                </div>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                <span className="text-2xl">👆</span>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-2xl shadow-xl p-6 backdrop-blur-sm bg-opacity-95 border border-white/20">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-1">Average Clicks</h3>
-                <p className="text-3xl font-bold text-blue-600">
-                  {urls.length > 0 ? Math.round(urls.reduce((sum, url) => sum + url.hitCount, 0) / urls.length) : 0}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                <span className="text-2xl">📊</span>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Your Links Section */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 backdrop-blur-sm bg-opacity-95 border border-white/20">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-              <span className="text-2xl mr-3">📋</span>
-              Your Links
-            </h2>
+        <Card>
+          <CardHeader>
+            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <div>
+                <CardTitle className="text-2xl font-bold text-gray-800 flex items-center">
+                  <span className="text-2xl mr-3">📋</span>
+                  Your Links
+                </CardTitle>
+                <CardDescription>
+                  Manage and track your shortened URLs
+                </CardDescription>
+              </div>
+            </div>
 
             {/* Search Bar */}
-            <div className="mb-6">
-              <input
+            <div className="mt-4">
+              <Input
                 type="text"
                 placeholder="🔍 Search by slug or original URL..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-3 text-gray-800 text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all duration-200 bg-gray-50 focus:bg-white"
+                className="max-w-md"
               />
             </div>
-          </div>
-
-          {isLoadingUrls ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="flex items-center space-x-3 text-gray-500">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                <span className="text-lg">Loading your links...</span>
+          </CardHeader>
+          <CardContent>
+            {isLoadingUrls ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="flex items-center space-x-3 text-gray-500">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                  <span className="text-lg">Loading your links...</span>
+                </div>
               </div>
-            </div>
-          ) : filteredUrls.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="text-6xl mb-4">🔗</div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                {searchTerm ? 'No matching links found' : 'No links yet'}
-              </h3>
-              <p className="text-gray-500 mb-6">
-                {searchTerm ? 'Try adjusting your search term' : 'Create your first short link to get started'}
-              </p>
-              {!searchTerm && (
-                <Link
-                  href="/"
-                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-blue-600 transition-all duration-200 shadow-lg hover:shadow-xl"
-                >
-                  🚀 Create First Link
-                </Link>
-              )}
-            </div>
-          ) : (
-            <div className="overflow-hidden rounded-2xl border border-gray-200 shadow-lg">
-              <div className="overflow-x-auto max-h-96">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gradient-to-r from-blue-50 to-blue-100 sticky top-0">
-                    <tr>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
-                        Short URL
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
-                        Original URL
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
-                        Created At
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
-                        QR Code
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
-                        Details
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-100">
+            ) : filteredUrls.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="text-6xl mb-4">🔗</div>
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                  {searchTerm ? 'No matching links found' : 'No links yet'}
+                </h3>
+                <p className="text-gray-500 mb-6">
+                  {searchTerm ? 'Try adjusting your search term' : 'Create your first short link to get started'}
+                </p>
+                {!searchTerm && (
+                  <Button asChild>
+                    <Link href="/">
+                      🚀 Create First Link
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <div className="border rounded-lg">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Short URL</TableHead>
+                      <TableHead>Original URL</TableHead>
+                      <TableHead>Created At</TableHead>
+                      <TableHead>QR Code  </TableHead>
+                      <TableHead>Details</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
                     {filteredUrls.map((url) => (
-                      <tr key={url.slug} className="hover:bg-blue-50 transition-colors duration-150">
-                        <td className="px-6 py-4 whitespace-nowrap">
+                      <TableRow key={url.slug} className="hover:bg-muted/50">
+                        <TableCell>
                           <a
                             href={formatShortUrl(url.slug)}
                             target="_blank"
@@ -206,42 +193,43 @@ export default function Dashboard() {
                           >
                             🔗 {formatShortUrl(url.slug)}
                           </a>
-                        </td>
-                        <td className="px-6 py-4">
+                        </TableCell>
+                        <TableCell>
                           <div className="text-sm text-gray-700 max-w-xs truncate font-medium" title={url.originalUrl}>
                             {url.originalUrl}
                           </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">
+                        </TableCell>
+                        <TableCell className="text-sm text-gray-600 font-medium">
                           {formatDate(url.createdAt)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <button
+                        </TableCell>
+                        <TableCell>
+                          <Button
                             onClick={() => openQRModal(url.slug)}
-                            className="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                            size="sm"
+                            variant="outline"
+                            className="h-10 w-10 p-0"
                             title="View QR Code"
                           >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                          </button>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <Link
-                            href={`/dashboard/${url.slug}`}
-                            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white text-sm font-semibold rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                          >
-                            📊 Details
-                          </Link>
-                        </td>
-                      </tr>
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          <Button asChild size="sm" className='bg-blue-500 text-white'>
+                            <Link href={`/dashboard/${url.slug}`}>
+                              📊 Details
+                            </Link>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                  </tbody>
-                </table>
+                  </TableBody>
+                </Table>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* QR Code Modal */}

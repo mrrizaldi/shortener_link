@@ -1,10 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { formatDistanceToNow } from 'date-fns';
 import ClicksOverTimeChart from '../../components/ClicksOverTimeChart';
 import BrowserDeviceChart from '../../components/BrowserDeviceChart';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useStats } from '@/lib/hooks';
 
 interface DetailStatsData {
   slug: string;
@@ -21,32 +26,9 @@ export default function DetailPage() {
   const params = useParams();
   const router = useRouter();
   const slug = params?.slug as string;
-  const [stats, setStats] = useState<DetailStatsData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
   const [currentInterval, setCurrentInterval] = useState('1d');
 
-  const fetchStats = async (interval: string) => {
-    try {
-      setIsLoading(true);
-      const response = await fetch(`/api/stats/${slug}?interval=${interval}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch stats');
-      }
-      const data = await response.json();
-      setStats(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (slug) {
-      fetchStats(currentInterval);
-    }
-  }, [slug, currentInterval]);
+  const { data: stats, isLoading, error } = useStats(slug, currentInterval);
 
   const handleIntervalChange = React.useCallback((interval: string) => {
     setCurrentInterval(interval);
@@ -81,13 +63,10 @@ export default function DetailPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center">
             <div className="text-6xl mb-4">❌</div>
-            <p className="text-red-600 text-lg mb-4">{error}</p>
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-600 transition-all duration-200 shadow-lg"
-            >
+            <p className="text-red-600 text-lg mb-4">{error.message || 'An error occurred'}</p>
+            <Button onClick={() => router.push('/dashboard')}>
               Back to Dashboard
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -108,63 +87,65 @@ export default function DetailPage() {
       <div className="max-w-6xl mx-auto relative z-10 py-8 px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <button
+          <Button
+            variant="ghost"
             onClick={() => router.push('/dashboard')}
-            className="mb-4 inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200"
+            className="mb-4"
           >
             ← Back to Dashboard
-          </button>
+          </Button>
           <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent mb-4">
             Link Details
           </h1>
         </div>
 
         {/* Short Link & QR Code Section */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-            <div className="lg:col-span-2">
-              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                <span className="text-2xl mr-2">🔗</span>
-                Short Link Information
-              </h2>
-
-              <div className="space-y-4">
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold text-gray-800 flex items-center">
+              <span className="text-2xl mr-2">🔗</span>
+              Short Link Information
+            </CardTitle>
+            <CardDescription>
+              Detailed information about your shortened link
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+              <div className="lg:col-span-2 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Short URL</label>
-                  <div className="flex items-center gap-2">
-                    <input
+                  <Label htmlFor="shortUrl" className="text-sm font-medium text-gray-600">Short URL</Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Input
+                      id="shortUrl"
                       type="text"
                       value={formatShortUrl(stats.slug)}
                       readOnly
-                      className="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-blue-600 font-mono text-sm"
+                      className="flex-1 text-blue-600 font-mono text-sm"
                     />
-                    <button
-                      onClick={copyToClipboard}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                    >
+                    <Button onClick={copyToClipboard} size="sm" className='bg-blue-500 text-white'>
                       Copy
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Original URL</label>
-                  <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm break-all">
-                    <a
-                      href={stats.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      {stats.url}
-                    </a>
+                  <Label htmlFor="originalUrl" className="text-sm font-medium text-gray-600">Original URL</Label>
+                  <div className="mt-1">
+                    <Input
+                      id="originalUrl"
+                      type="text"
+                      value={stats.url}
+                      readOnly
+                      className="text-sm"
+                    />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Created</label>
-                    <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-800 font-medium">
+                    <Label className="text-sm font-medium text-gray-600">Created</Label>
+                    <div className="mt-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-800 font-medium">
                       {new Date(stats.createdAt).toLocaleString('en-US', {
                         year: 'numeric',
                         month: 'long',
@@ -177,37 +158,38 @@ export default function DetailPage() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Total Clicks</label>
-                    <div className="px-3 py-2 bg-blue-50 border border-blue-300 rounded-lg text-sm font-bold text-blue-700">
+                    <Label className="text-sm font-medium text-gray-600">Total Clicks</Label>
+                    <div className="mt-1 px-3 py-2 bg-blue-50 border border-blue-300 rounded-lg text-sm font-bold text-blue-700">
                       {stats.totalClicks}
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* QR Code */}
-            <div className="flex justify-center">
-              <div className="flex flex-col items-center space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800">QR Code</h3>
-                <div className="p-4 bg-white border-2 border-gray-200 rounded-xl shadow-md">
-                  <img
-                    src={`/api/qr/${stats.slug}`}
-                    alt={`QR Code for ${formatShortUrl(stats.slug)}`}
-                    className="w-32 h-32"
-                  />
+              {/* QR Code */}
+              <div className="flex justify-center">
+                <div className="flex flex-col items-center space-y-4">
+                  <Label className="text-lg font-semibold text-gray-800">QR Code</Label>
+                  <div className="p-4 bg-white border-2 border-gray-200 rounded-xl shadow-md">
+                    <img
+                      src={`/api/qr/${stats.slug}`}
+                      alt={`QR Code for ${formatShortUrl(stats.slug)}`}
+                      className="w-32 h-32"
+                    />
+                  </div>
+                  <Button asChild variant="outline" size="sm">
+                    <a
+                      href={`/api/qr/${stats.slug}`}
+                      download={`qr-${stats.slug}.png`}
+                    >
+                      Download QR
+                    </a>
+                  </Button>
                 </div>
-                <a
-                  href={`/api/qr/${stats.slug}`}
-                  download={`qr-${stats.slug}.png`}
-                  className="px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors"
-                >
-                  Download QR
-                </a>
               </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Analytics Grid */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
@@ -228,47 +210,48 @@ export default function DetailPage() {
 
         {/* Referrer Stats */}
         {stats.topReferrers.length > 0 && (
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-              <span className="text-2xl mr-2">🔍</span>
-              Top Referrers
-            </h3>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Referrer
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Clicks
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Percentage
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {stats.topReferrers.map((referrer, index) => {
-                    const percentage = ((referrer.clicks / stats.totalClicks) * 100).toFixed(1);
-                    return (
-                      <tr key={index} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
-                          {referrer.referrer || 'Direct'}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-900 font-semibold">
-                          {referrer.clicks}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-500">
-                          {percentage}%
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl font-bold text-gray-800 flex items-center">
+                <span className="text-2xl mr-2">🔍</span>
+                Top Referrers
+              </CardTitle>
+              <CardDescription>
+                Sources of traffic to your link
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="border rounded-lg">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Referrer</TableHead>
+                      <TableHead>Clicks</TableHead>
+                      <TableHead>Percentage</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {stats.topReferrers.map((referrer, index) => {
+                      const percentage = ((referrer.clicks / stats.totalClicks) * 100).toFixed(1);
+                      return (
+                        <TableRow key={index}>
+                          <TableCell className="max-w-xs truncate">
+                            {referrer.referrer || 'Direct'}
+                          </TableCell>
+                          <TableCell className="font-semibold">
+                            {referrer.clicks}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {percentage}%
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>

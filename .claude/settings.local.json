@@ -10,7 +10,18 @@
       "Bash(pnpm add chart.js react-chartjs-2)",
       "Bash(pnpm add qrcode)",
       "Bash(pnpm add -D @types/qrcode)",
-      "Bash(pnpm add date-fns)"
+      "Bash(pnpm add date-fns)",
+      "Bash(pnpm dlx shadcn@latest init)",
+      "Bash(pnpm dlx shadcn@latest add button input card table modal dialog select chart)",
+      "Bash(pnpm dlx shadcn@latest add button)",
+      "Bash(pnpm dlx shadcn@latest add input)",
+      "Bash(pnpm dlx shadcn@latest add card)",
+      "Bash(pnpm dlx shadcn@latest add table)",
+      "Bash(pnpm dlx shadcn@latest add dialog)",
+      "Bash(pnpm dlx shadcn@latest add select)",
+      "Bash(pnpm dlx shadcn@latest add chart)",
+      "Bash(pnpm dlx shadcn@latest add label)",
+      "Bash(pnpm add @tanstack/react-query)"
     ],
     "deny": [],
     "ask": []

@@ -1,6 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface QRModalProps {
   isOpen: boolean;
@@ -11,8 +20,6 @@ interface QRModalProps {
 
 export default function QRModal({ isOpen, onClose, slug, shortUrl }: QRModalProps) {
   const [isLoading, setIsLoading] = useState(false);
-
-  if (!isOpen) return null;
 
   const qrCodeUrl = `/api/qr/${slug}`;
 
@@ -26,33 +33,20 @@ export default function QRModal({ isOpen, onClose, slug, shortUrl }: QRModalProp
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
-        onClick={onClose}
-      />
-
-      {/* Modal */}
-      <div className="relative bg-white rounded-xl shadow-xl p-6 max-w-md w-full mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-gray-800 flex items-center">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-md mx-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center">
             <span className="text-2xl mr-2">📱</span>
             QR Code
-          </h3>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+          </DialogTitle>
+          <DialogDescription>
+            Scan this QR code to access your short link
+          </DialogDescription>
+        </DialogHeader>
 
         {/* QR Code */}
-        <div className="text-center mb-6">
+        <div className="text-center my-6">
           <div className="inline-block p-4 bg-white border-2 border-gray-200 rounded-xl shadow-md">
             <img
               src={qrCodeUrl}
@@ -70,30 +64,33 @@ export default function QRModal({ isOpen, onClose, slug, shortUrl }: QRModalProp
         </div>
 
         {/* URL Display */}
-        <div className="mb-6">
-          <p className="text-sm text-gray-600 mb-2">Short URL:</p>
-          <div className="p-3 bg-gray-50 rounded-lg border">
-            <p className="text-blue-600 font-mono text-sm break-all">{shortUrl}</p>
-          </div>
+        <div className="space-y-2">
+          <p className="text-sm text-gray-600">Short URL:</p>
+          <Input
+            value={shortUrl}
+            readOnly
+            className="text-blue-600 font-mono text-sm"
+          />
         </div>
 
         {/* Actions */}
-        <div className="flex gap-3">
-          <button
+        <div className="flex gap-3 mt-6">
+          <Button
             onClick={handleDownload}
-            className="flex-1 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold py-3 px-4 rounded-lg hover:from-blue-700 hover:to-blue-600 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center"
+            className="flex-1 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
           >
             <span className="mr-2">📥</span>
             Download QR
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onClose}
-            className="flex-1 bg-gray-200 text-gray-800 font-semibold py-3 px-4 rounded-lg hover:bg-gray-300 transition-colors duration-200"
+            variant="outline"
+            className="flex-1"
           >
             Close
-          </button>
+          </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

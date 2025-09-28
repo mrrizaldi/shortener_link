@@ -24,6 +24,9 @@ export default async function handler(
       }
     });
 
+    // Add caching headers
+    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+
     return res.status(200).json(urls);
   } catch (error) {
     console.error('Error fetching URLs:', error);

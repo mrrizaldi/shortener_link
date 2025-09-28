@@ -1,6 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Home() {
   const [originalUrl, setOriginalUrl] = useState('');
@@ -69,97 +73,127 @@ export default function Home() {
         </div>
 
         {/* Main Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 backdrop-blur-sm bg-opacity-95 border border-white/20">
-          <div className="flex items-center mb-6">
-            <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-            <div className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
-            <div className="w-3 h-3 bg-red-500 rounded-full mr-4"></div>
-            <h2 className="text-2xl font-bold text-gray-800">Create Short Link</h2>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label htmlFor="originalUrl" className="block text-sm font-semibold text-gray-700">
-                🌐 Original URL
-              </label>
-              <input
-                type="url"
-                id="originalUrl"
-                value={originalUrl}
-                onChange={(e) => setOriginalUrl(e.target.value)}
-                placeholder="https://example.com/your-very-long-url-that-needs-shortening"
-                required
-                className="w-full px-4 py-4 text-gray-800 text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all duration-200 bg-gray-50 focus:bg-white"
-              />
+        <Card className="backdrop-blur-sm bg-opacity-95 border-white/20">
+          <CardHeader>
+            <div className="flex items-center mb-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+              <div className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
+              <div className="w-3 h-3 bg-red-500 rounded-full mr-4"></div>
+              <CardTitle className="text-2xl font-bold text-gray-800">Create Short Link</CardTitle>
             </div>
-
-            <div className="space-y-2">
-              <label htmlFor="customSlug" className="block text-sm font-semibold text-gray-700">
-                ✨ Custom Slug <span className="text-gray-400 font-normal">(optional)</span>
-              </label>
-              <input
-                type="text"
-                id="customSlug"
-                value={customSlug}
-                onChange={(e) => setCustomSlug(e.target.value)}
-                placeholder="my-awesome-link"
-                className="w-full px-4 py-4 text-gray-800 text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all duration-200 bg-gray-50 focus:bg-white"
-              />
-              <p className="text-sm text-gray-500 flex items-center">
-                💡 Leave empty to auto-generate a unique slug
-              </p>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white text-lg font-bold px-8 py-4 rounded-xl hover:from-blue-700 hover:to-blue-600 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  Shortening...
-                </span>
-              ) : (
-                <span className="flex items-center justify-center">
-                  ⚡ Shorten URL
-                </span>
-              )}
-            </button>
-          </form>
-
-          {error && (
-            <div className="mt-6 p-4 bg-red-50 border-l-4 border-red-400 rounded-r-xl">
-              <div className="flex items-center">
-                <span className="text-red-400 text-xl mr-3">❌</span>
-                <p className="text-red-700 font-medium">{error}</p>
-              </div>
-            </div>
-          )}
-
-          {shortUrl && (
-            <div className="mt-6 p-6 bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-400 rounded-r-xl">
-              <div className="flex items-center mb-3">
-                <span className="text-green-500 text-xl mr-3">🎉</span>
-                <p className="text-green-800 font-bold">Your short URL is ready!</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <input
-                  type="text"
-                  value={shortUrl}
-                  readOnly
-                  className="flex-1 px-4 py-3 bg-white border-2 border-green-200 rounded-lg text-blue-600 font-mono text-sm selection:bg-blue-100"
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="originalUrl" className="text-sm font-semibold text-gray-700">
+                  🌐 Original URL
+                </Label>
+                <Input
+                  type="url"
+                  id="originalUrl"
+                  value={originalUrl}
+                  onChange={(e) => setOriginalUrl(e.target.value)}
+                  placeholder="https://example.com/your-very-long-url-that-needs-shortening"
+                  required
+                  className="text-lg border-2 focus:ring-4 focus:ring-blue-500/10"
                 />
-                <button
-                  onClick={copyToClipboard}
-                  className="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors duration-200 shadow-md hover:shadow-lg"
-                >
-                  📋 Copy
-                </button>
               </div>
-            </div>
-          )}
-        </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="customSlug" className="text-sm font-semibold text-gray-700">
+                  ✨ Custom Slug <span className="text-gray-400 font-normal">(optional)</span>
+                </Label>
+                <Input
+                  type="text"
+                  id="customSlug"
+                  value={customSlug}
+                  onChange={(e) => setCustomSlug(e.target.value)}
+                  placeholder="my-awesome-link"
+                  className="text-lg border-2 focus:ring-4 focus:ring-blue-500/10"
+                />
+                <p className="text-sm text-gray-500 flex items-center">
+                  💡 Leave empty to auto-generate a unique slug
+                </p>
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white text-lg font-bold px-8 py-4 h-auto hover:from-blue-700 hover:to-blue-600 disabled:from-gray-400 disabled:to-gray-500"
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Shortening...
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center">
+                    ⚡ Shorten URL
+                  </span>
+                )}
+              </Button>
+            </form>
+
+            {error && (
+              <div className="mt-6 p-4 bg-red-50 border-l-4 border-red-400 rounded-r-xl">
+                <div className="flex items-center">
+                  <span className="text-red-400 text-xl mr-3">❌</span>
+                  <p className="text-red-700 font-medium">{error}</p>
+                </div>
+              </div>
+            )}
+
+            {shortUrl && (
+              <div className="mt-6 p-6 bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-400 rounded-r-xl">
+                <div className="flex items-center mb-3">
+                  <span className="text-green-500 text-xl mr-3">🎉</span>
+                  <p className="text-green-800 font-bold">Your short URL is ready!</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Input
+                    type="text"
+                    value={shortUrl}
+                    readOnly
+                    className="flex-1 bg-white border-2 border-green-200 text-blue-600 font-mono text-sm"
+                  />
+                  <Button
+                    onClick={copyToClipboard}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    📋 Copy
+                  </Button>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* How it works section */}
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold text-blue-700">How it works</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ol className="space-y-2 text-gray-700">
+              <li className="flex items-start">
+                <span className="font-bold text-blue-600 mr-2">1.</span>
+                <span>Paste your long URL into the form above</span>
+              </li>
+              <li className="flex items-start">
+                <span className="font-bold text-blue-600 mr-2">2.</span>
+                <span>Optionally customize your short link slug</span>
+              </li>
+              <li className="flex items-start">
+                <span className="font-bold text-blue-600 mr-2">3.</span>
+                <span>Click "Shorten URL" and get your shareable link instantly</span>
+              </li>
+              <li className="flex items-start">
+                <span className="font-bold text-blue-600 mr-2">4.</span>
+                <span>Track clicks and analytics in the Dashboard</span>
+              </li>
+            </ol>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

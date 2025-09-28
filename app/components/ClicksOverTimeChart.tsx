@@ -1,6 +1,10 @@
 'use client';
 
 import React from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 interface ClicksOverTimeData {
   timestamp: string;
@@ -24,8 +28,14 @@ const INTERVAL_OPTIONS = [
   { value: '30d', label: '30 days' }
 ];
 
+const chartConfig = {
+  clicks: {
+    label: "Clicks",
+    color: "#3b82f6", // blue-500
+  },
+};
+
 const ClicksOverTimeChart = React.memo(function ClicksOverTimeChart({ data, interval, onIntervalChange }: ClicksOverTimeChartProps) {
-  const maxClicks = React.useMemo(() => Math.max(...data.map(d => d.clicks), 1), [data]);
 
   const formatTimestamp = React.useCallback((timestamp: string, interval: string) => {
     const date = new Date(timestamp);
@@ -50,55 +60,72 @@ const ClicksOverTimeChart = React.memo(function ClicksOverTimeChart({ data, inte
     }
   }, []);
 
-  return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-gray-800 flex items-center">
-          <span className="text-2xl mr-2">📈</span>
-          Clicks Over Time
-        </h3>
-        <select
-          value={interval}
-          onChange={(e) => onIntervalChange(e.target.value)}
-          className="border-2 border-gray-300 rounded-md px-3 py-1 text-sm font-medium text-gray-800 focus:border-blue-500 focus:outline-none transition-colors bg-white"
-        >
-          {INTERVAL_OPTIONS.map(option => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
+  const chartData = React.useMemo(() => {
+    return data.map(item => ({
+      ...item,
+      formattedTime: formatTimestamp(item.timestamp, interval)
+    }));
+  }, [data, interval, formatTimestamp]);
 
-      {data.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="text-4xl mb-4">📊</div>
-          <p className="text-gray-500">No click data available for this interval</p>
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <div>
+          <CardTitle className="text-xl font-bold text-gray-800 flex items-center">
+            <span className="text-2xl mr-2">📈</span>
+            Clicks Over Time
+          </CardTitle>
+          <CardDescription>
+            Track your link performance over different time periods
+          </CardDescription>
         </div>
-      ) : (
-        <div className="h-64 flex items-end space-x-1 overflow-x-auto">
-          {data.map((item, index) => (
-            <div key={index} className="flex flex-col items-center flex-shrink-0 min-w-[40px]">
-              <div className="mb-2 text-xs font-semibold text-blue-600">
-                {item.clicks}
-              </div>
-              <div
-                className="w-8 bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-md min-h-[4px] flex items-end justify-center relative group cursor-pointer"
-                style={{ height: `${(item.clicks / maxClicks) * 200}px` }}
-              >
-                {/* Tooltip */}
-                <div className="absolute bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
-                  {formatTimestamp(item.timestamp, interval)}: {item.clicks} clicks
-                </div>
-              </div>
-              <div className="mt-2 text-xs text-gray-500 transform -rotate-45 origin-top-left w-20 text-center">
-                {formatTimestamp(item.timestamp, interval)}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+        <Select value={interval} onValueChange={onIntervalChange}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select interval" />
+          </SelectTrigger>
+          <SelectContent>
+            {INTERVAL_OPTIONS.map(option => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </CardHeader>
+      <CardContent>
+        {data.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-4xl mb-4">📊</div>
+            <p className="text-gray-500">No click data available for this interval</p>
+          </div>
+        ) : (
+          <ChartContainer config={chartConfig} className="h-[400px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis
+                  dataKey="formattedTime"
+                  className="text-xs fill-muted-foreground"
+                  angle={-45}
+                  textAnchor="end"
+                  height={60}
+                />
+                <YAxis className="text-xs fill-muted-foreground" />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Line
+                  type="monotone"
+                  dataKey="clicks"
+                  stroke="#3b82f6"
+                  strokeWidth={3}
+                  dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, stroke: "#3b82f6", strokeWidth: 2 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        )}
+      </CardContent>
+    </Card>
   );
 });
 

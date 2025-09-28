@@ -168,6 +168,9 @@ export default async function handler(
       clicks: item._count.id
     }));
 
+    // Add caching headers - shorter cache for stats as they update more frequently
+    res.setHeader('Cache-Control', 's-maxage=120, stale-while-revalidate=300');
+
     // Return comprehensive stats
     return res.status(200).json({
       slug,
