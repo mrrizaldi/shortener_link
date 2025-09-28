@@ -22,11 +22,18 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy the standalone output from Next.js build
+# Copy built application
 COPY --from=deps /app/node_modules ./node_modules
-COPY build/.next/standalone ./
-COPY build/.next/static ./.next/static
+COPY build/.next ./.next
 COPY build/public ./public
+COPY build/package*.json ./
+COPY build/app ./app
+COPY build/pages ./pages
+COPY build/next.config.ts ./
+COPY build/prisma ./prisma
+
+# Change ownership of the app directory to nextjs user
+RUN chown -R nextjs:nodejs /app
 
 USER nextjs
 
@@ -35,5 +42,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Start the application using the standalone server
-CMD ["node", "server.js"]
+# Start the application using Next.js start command
+CMD ["pnpm", "start"]
