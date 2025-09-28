@@ -11,7 +11,8 @@ COPY build/package*.json ./
 COPY build/pnpm-lock.yaml* ./
 
 # Install dependencies using pnpm
-RUN corepack enable pnpm && pnpm install --frozen-lockfile --prod
+RUN corepack enable pnpm && pnpm install --frozen-lockfile --prod --ignore-scripts
+RUN pnpm prisma generate
 
 # Production image, copy all the files and run next
 FROM base AS runner
