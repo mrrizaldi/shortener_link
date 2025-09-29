@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useUrls, useDeleteUrl } from '@/lib/hooks';
+import { useUrls, useDeleteUrl, useInvalidateCache } from '@/lib/hooks';
 
 interface UrlRecord {
   slug: string;
@@ -18,10 +18,12 @@ interface UrlRecord {
 }
 
 export default function Dashboard() {
-  const { data: urls = [], isLoading: isLoadingUrls } = useUrls();
+  const { data: urls = [], isLoading: isLoadingUrls, refetch: refetchUrls } = useUrls();
   const deleteUrl = useDeleteUrl();
+  const { invalidateUrls } = useInvalidateCache();
   const [searchTerm, setSearchTerm] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [qrModal, setQrModal] = useState<{ isOpen: boolean; slug: string; shortUrl: string }>({
     isOpen: false,
     slug: '',
@@ -71,11 +73,23 @@ export default function Dashboard() {
     }
   };
 
+  const handleRefresh = async () => {
+    try {
+      setIsRefreshing(true);
+      invalidateUrls();
+      await refetchUrls();
+    } catch (error) {
+      console.error('Failed to refresh:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-25 to-white relative overflow-hidden pt-16">
       {/* Loading Overlay */}
       {isDeleting && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-8 flex flex-col items-center space-y-4 shadow-2xl">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
             <p className="text-lg font-medium text-gray-700">Deleting URL...</p>
@@ -92,6 +106,24 @@ export default function Dashboard() {
       <div className="max-w-6xl mx-auto relative z-10 px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div></div>
+            <Button
+              onClick={handleRefresh}
+              disabled={isRefreshing || isLoadingUrls}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              {isRefreshing ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              )}
+              Refresh
+            </Button>
+          </div>
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent mb-4">
             Dashboard
           </h1>

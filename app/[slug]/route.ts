@@ -10,9 +10,12 @@ export async function GET(
   const { slug } = await params;
 
   try {
-    // Query database for the slug
+    // Query database for the slug, excluding soft-deleted URLs
     const urlRecord = await prisma.url.findUnique({
-      where: { slug }
+      where: {
+        slug,
+        isDeleted: false
+      }
     });
 
     // If not found, return 404

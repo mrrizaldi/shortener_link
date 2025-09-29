@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useStats, useDeleteUrl } from '@/lib/hooks';
+import { useStats, useDeleteUrl, useInvalidateCache } from '@/lib/hooks';
 
 interface DetailStatsData {
   slug: string;
@@ -28,8 +28,10 @@ export default function DetailPage() {
   const slug = params?.slug as string;
   const [currentInterval, setCurrentInterval] = useState('1d');
 
-  const { data: stats, isLoading, error } = useStats(slug, currentInterval);
+  const { data: stats, isLoading, error, refetch: refetchStats } = useStats(slug, currentInterval);
   const deleteUrl = useDeleteUrl();
+  const { invalidateStats } = useInvalidateCache();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleIntervalChange = React.useCallback((interval: string) => {
     setCurrentInterval(interval);
@@ -55,6 +57,20 @@ export default function DetailPage() {
       }
     }
   }, [slug, deleteUrl, router]);
+
+  const handleRefresh = React.useCallback(async () => {
+    if (!slug) return;
+
+    try {
+      setIsRefreshing(true);
+      invalidateStats(slug);
+      await refetchStats();
+    } catch (error) {
+      console.error('Failed to refresh stats:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [slug, invalidateStats, refetchStats]);
 
   if (isLoading) {
     return (
@@ -106,21 +122,38 @@ export default function DetailPage() {
             >
               ← Back to Dashboard
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={deleteUrl.isPending}
-              className="flex items-center gap-2"
-            >
-              {deleteUrl.isPending ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              ) : (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-              )}
-              Delete URL
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleRefresh}
+                disabled={isRefreshing || isLoading}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                {isRefreshing ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                )}
+                Refresh
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={deleteUrl.isPending}
+                className="flex items-center gap-2"
+              >
+                {deleteUrl.isPending ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                )}
+                Delete URL
+              </Button>
+            </div>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent mb-4">
             Link Details

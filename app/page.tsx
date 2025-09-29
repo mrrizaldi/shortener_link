@@ -5,45 +5,32 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useCreateUrl } from '@/lib/hooks';
 
 export default function Home() {
   const [originalUrl, setOriginalUrl] = useState('');
   const [customSlug, setCustomSlug] = useState('');
   const [shortUrl, setShortUrl] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+
+  const createUrl = useCreateUrl();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setShortUrl('');
-    setIsLoading(true);
 
     try {
-      const response = await fetch('/api/shorten', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          originalUrl,
-          customSlug: customSlug || undefined,
-        }),
+      const result = await createUrl.mutateAsync({
+        originalUrl,
+        customSlug: customSlug || undefined,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to shorten URL');
-      }
-
-      setShortUrl(data.shortUrl);
+      setShortUrl(result.shortUrl);
       setOriginalUrl('');
       setCustomSlug('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -118,10 +105,10 @@ export default function Home() {
 
               <Button
                 type="submit"
-                disabled={isLoading}
+                disabled={createUrl.isPending}
                 className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white text-lg font-bold px-8 py-4 h-auto hover:from-blue-700 hover:to-blue-600 disabled:from-gray-400 disabled:to-gray-500"
               >
-                {isLoading ? (
+                {createUrl.isPending ? (
                   <span className="flex items-center justify-center">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                     Shortening...

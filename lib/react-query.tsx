@@ -12,7 +12,8 @@ export default function ReactQueryProvider({ children }: { children: ReactNode }
             staleTime: 5 * 60 * 1000, // 5 minutes
             gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
             retry: 1,
-            refetchOnWindowFocus: false,
+            refetchOnWindowFocus: true, // Enable refetch on window focus
+            refetchOnMount: true, // Always refetch on mount
           },
         },
       })
